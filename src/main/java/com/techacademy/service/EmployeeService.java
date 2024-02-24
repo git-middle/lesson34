@@ -52,6 +52,39 @@ public class EmployeeService {
         return ErrorKinds.SUCCESS;
     }
 
+    // 従業員更新
+    @Transactional
+    public ErrorKinds update(Employee employee) {
+
+     // パスワードが空欄の場合に既存のパスワードをコピーする
+        if (employee.getPassword() == null || employee.getPassword().isEmpty()) {
+            Employee oldEmployee = this.findByCode(employee.getCode());
+
+            if (oldEmployee != null) {
+                employee.setPassword(oldEmployee.getPassword());
+            }
+        }else {
+
+         // パスワードが入力されている場合、入力チェックを行う
+            ErrorKinds result = employeePasswordCheck(employee);
+            if (ErrorKinds.CHECK_OK != result) {
+                return result;
+            }
+
+        }
+
+
+        employee.setDeleteFlg(false);
+
+        LocalDateTime now = LocalDateTime.now();
+        employee.setCreatedAt(now);
+        employee.setUpdatedAt(now);
+
+        employeeRepository.save(employee);
+        return ErrorKinds.SUCCESS;
+
+    }
+
     // 従業員削除
     @Transactional
     public ErrorKinds delete(String code, UserDetail userDetail) {
@@ -75,6 +108,7 @@ public class EmployeeService {
 
     // 1件を検索
     public Employee findByCode(String code) {
+
         // findByIdで検索
         Optional<Employee> option = employeeRepository.findById(code);
         // 取得できなかった場合はnullを返す
@@ -118,5 +152,6 @@ public class EmployeeService {
         int passwordLength = employee.getPassword().length();
         return passwordLength < 8 || 16 < passwordLength;
     }
+
 
 }
