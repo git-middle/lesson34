@@ -54,7 +54,7 @@ public class ReportController {
     @GetMapping(value = "/{id}/")
     public String detail(@PathVariable Integer id, Model model) {
 
-        model.addAttribute("report", reportService.findByCode(id));
+        model.addAttribute("report", reportService.findById(id));
         return "reports/detail";
     }
 
@@ -92,7 +92,7 @@ public class ReportController {
     public String edit(@PathVariable("id") Integer id, Model model) {
 
         if (id != null) {
-            model.addAttribute("report", reportService.findByCode(id));
+            model.addAttribute("report", reportService.findById(id));
         }
         return "reports/update";
     }
@@ -130,7 +130,7 @@ public class ReportController {
 
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            model.addAttribute("report", reportService.findByCode(id));
+            model.addAttribute("report", reportService.findById(id));
             return detail(id, model);
         }
 

@@ -33,11 +33,10 @@ public class ReportService {
     @Transactional
     public ErrorKinds save(Report report) {
 
-//        // 従業員番号重複チェック
-//        if (findByCode(report.getCode()) != null) {
-//            return ErrorKinds.DUPLICATE_ERROR;
-//        }
-
+        //従業員番号重複チェック
+       if (findByEmployeeAndReportDate(report.getEmployee().getCode()) != null) {
+            return ErrorKinds.DUPLICATE_ERROR;
+        }
         report.setDeleteFlg(false);
 
         LocalDateTime now = LocalDateTime.now();
@@ -48,13 +47,17 @@ public class ReportService {
         return ErrorKinds.SUCCESS;
     }
 
+    private Report findByEmployeeAndReportDate(String code) {
+        return reportRepository.findByEmployeeCodeAndReportDate(code, LocalDate.now());
+    }
+    
     public ErrorKinds existsByIdAndLocalDate(Report report,Employee code,LocalDate report_date) {
         Integer check = reportRepository.countByEmployeeAndReportDate(code,report_date);
 
         if (check >= 1) {
             return ErrorKinds.DATECHECK_ERROR;
         } else {
-            reportRepository.save(report);
+
             return ErrorKinds.SUCCESS;
         }
 
@@ -88,7 +91,7 @@ public class ReportService {
             return ErrorKinds.LOGINCHECK_ERROR;
         }
      */
-        Report report = findByCode(id);
+        Report report = findById(id);
         LocalDateTime now = LocalDateTime.now();
         report.setUpdatedAt(now);
         report.setDeleteFlg(true);
@@ -102,7 +105,7 @@ public class ReportService {
     }
 
     // 1件を検索
-    public Report findByCode(Integer id) {
+    public Report findById(Integer id) {
 
         // findByIdで検索
         Optional<Report> option = reportRepository.findById(id);
