@@ -81,7 +81,7 @@ public class ReportController {
 
         if (ErrorMessage.contains(result)) {
             model.addAttribute(ErrorMessage.getErrorName(result), ErrorMessage.getErrorValue(result));
-            return create(report,model,null);
+            return create(report,model,userDetail);
         }
 
         return "redirect:/reports";

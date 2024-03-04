@@ -29,13 +29,13 @@ public class ReportService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 日報保存
+    // 日報新規登録（保存）
     @Transactional
     public ErrorKinds save(Report report) {
 
-        //従業員番号重複チェック
-       if (findByEmployeeAndReportDate(report.getEmployee().getCode()) != null) {
-            return ErrorKinds.DUPLICATE_ERROR;
+        //日付重複チェック
+       if (findByEmployeeAndReportDate(report.getEmployee().getCode(),report.getReportDate()) != null) {
+            return ErrorKinds.DATECHECK_ERROR;
         }
         report.setDeleteFlg(false);
 
@@ -47,10 +47,10 @@ public class ReportService {
         return ErrorKinds.SUCCESS;
     }
 
-    private Report findByEmployeeAndReportDate(String code) {
-        return reportRepository.findByEmployeeCodeAndReportDate(code, LocalDate.now());
+    private Report findByEmployeeAndReportDate(String code,LocalDate reportDate) {
+        return reportRepository.findByEmployeeCodeAndReportDate(code, reportDate);
     }
-    
+
     public ErrorKinds existsByIdAndLocalDate(Report report,Employee code,LocalDate report_date) {
         Integer check = reportRepository.countByEmployeeAndReportDate(code,report_date);
 
@@ -76,9 +76,14 @@ public class ReportService {
         report.setCreatedAt(now);
         report.setUpdatedAt(now);
 
+        if (!oldReport.getReportDate().equals(report.getReportDate())) {
+            if (findByEmployeeAndReportDate(report.getEmployee().getCode(), report.getReportDate()) != null) {
+                return ErrorKinds.DATECHECK_ERROR;
+            }
+        }
+
         reportRepository.save(report);
         return ErrorKinds.SUCCESS;
-
     }
 
     // 削除
