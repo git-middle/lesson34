@@ -23,7 +23,8 @@
                                 <div class="wizard wizard-success mb-4">
                                 <p>パスワードは変更する場合のみ入力してください。</p>
                                     <div class="mb-3">
-                                        <label class="form-label" for="code" th:value="*{code}" th:text="*{code}">社員番号</label>
+                                        <label class="form-label" for="code">社員番号</label><br>
+                                        <label for="code" th:value="*{code}" th:text="*{code}"></label>
                                         <p class="mb-1"></p>
                                         <div class="col-md-7">
                                             <input class="form-control" type="hidden" th:field="*{code}" id="code">
