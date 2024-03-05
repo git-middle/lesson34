@@ -8,6 +8,7 @@ import java.util.Set;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.techacademy.constants.ErrorKinds;
 import com.techacademy.constants.ErrorMessage;
-
+import com.techacademy.entity.Employee;
 import com.techacademy.entity.Report;
 import com.techacademy.service.ReportService;
 import com.techacademy.service.UserDetail;
@@ -41,11 +42,20 @@ public class ReportController {
     }
 
     // 日報一覧画面
-    @GetMapping
-    public String list(Model model) {
+    @GetMapping("")
+    public String list(Model model, @AuthenticationPrincipal UserDetail userDetail) {
+        List<Report> reports;
 
-        model.addAttribute("listSize", reportService.findAll().size());
-        model.addAttribute("reportList", reportService.findAll());
+        if (userDetail.getEmployee().getRole().equals(Employee.Role.ADMIN)) {
+            // 管理者の場合
+            model.addAttribute("listSize", reportService.findAll().size());
+            model.addAttribute("reportList", reportService.findAll());
+        } else {
+            // 管理者でない場合
+            reports = reportService.findByEmployee(userDetail.getEmployee());
+            model.addAttribute("listSize", reportService.findByEmployee(userDetail.getEmployee()).size());
+            model.addAttribute("reportList", reportService.findByEmployee(userDetail.getEmployee()));
+        }
 
         return "reports/list";
     }
